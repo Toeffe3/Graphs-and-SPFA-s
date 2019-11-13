@@ -2,7 +2,7 @@ class Node {
   constructor(x,y,weight) {
     if(x==undefined){this.isempty=true;return this.isempty;}
     this.isempty=false;
-    this.start=false;
+    this.home=false;
     this.end=false;
     this.weight=weight;
     this.degree=0;
@@ -18,7 +18,8 @@ class Node {
     fill(255);
     if(this==graph.selected[0]||this==graph.selected[1])fill(0,255,0);
     else if(this.collide(20))fill(255,255,0);
-    else if(this.start)fill();
+    else if(this.home)fill(255,0,255);
+    else if(this.end)fill(0,0,255);
     ellipse(this.x,this.y,20);
   }
 

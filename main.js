@@ -9,17 +9,31 @@ function setup() {
   unconnectBtn = createButton('Frakobel');
   setStartBtn = createButton('Hjem');
   setEndBtn = createButton('Mål');
+  clearSelection = createButton('Ryd markering');
   connectBtn.mousePressed(function() {graph.connect();});
   unconnectBtn.mousePressed(function() {graph.unconnect();});
   setStartBtn.mousePressed(function() {graph.sethome();});
   setEndBtn.mousePressed(function() {graph.setend();});
+  clearSelection.mousePressed(function() {graph.nosel();});
 }
 
 function draw() {
   background(0);
   graph.draw();
-  if(graph.selected[0].isempty||graph.selected[1].isempty)connectBtn.hide();
-  else connectBtn.show();
+  if(graph.unconnect(true)) unconnectBtn.show(); else {
+    unconnectBtn.hide();
+    if(!graph.selected[0].isempty&&!graph.selected[1].isempty) connectBtn.show();
+    else connectBtn.hide();
+  }
+  if(!graph.selected[1].isempty && (graph.selected[0].isempty || graph.selected[0] == graph.selected[1])) {
+    setStartBtn.show();
+    setEndBtn.show();
+  } else {
+    setStartBtn.hide();
+    setEndBtn.hide();
+  }
+  if(graph.selected[0].isempty&&graph.selected[1].isempty) clearSelection.hide();
+  else clearSelection.show();
 }
 
 function mousePressed() {
