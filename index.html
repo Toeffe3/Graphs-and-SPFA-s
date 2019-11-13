@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Grafteori</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+    //'use strict';
+
+      class Graph {
+
+        constructor(nodes=[], edges=[]) {
+          this.nodes=nodes;
+          this.edges=edges;
+          this.selected = [new Node(null), new Node(null)];
+        }
+
+        add(x) {
+          this.nodes.push(x);
+          return this;
+        }
+
+        draw() {
+          for (let e of this.edges) e.draw();
+          for (let n of this.nodes) n.draw();
+        }
+
+        connect() {
+          this.edges.push(new Edge(this.selected[0], this.selected[1]));
+          this.selected = [new Node(null),new Node(null)];
+        }
+
+        unconnect() {
+          for(let c of this.edges)if((c.nodes[0]==this.selected[0]||c.nodes[0]==this.selected[1])&&(c.nodes[1]==this.selected[0]||c.nodes[1]==this.selected[1]))this.edges.splice(this.edges.indexOf(c),1);
+          this.selected = [new Node(null),new Node(null)];
+        }
+
+        valueOf() {
+          return this.nodes;
+        }
+      }
+
+      class Node {
+        constructor(x, y, weight) {
+          if(x==undefined) {this.isempty=true; return this.isempty;}
+          this.isempty=false;
+          this.start = false;
+          this.end = false;
+          this.weight = weight;
+          if(typeof x=="number"&&typeof y=="number")if(this.x=x)this.y = y;
+        }
+        collide(t=1,x=mouseX,y=mouseY) {
+          if(x<this.x+t&&x>this.x-t&&y<this.y+t&&y>this.y-t)return true;
+          return false;
+        }
+        draw() {
+          fill(255);
+          if(this==graph.selected[0]||this==graph.selected[1])fill(0,255,0);
+          else if(this.collide(20))fill(255,255,0);
+          else if(this.start)fill();
+          ellipse(this.x, this.y, 20);
+        }
+        valueOf(c) {
+          if(c) return this[c];
+          return [this.x, this.y];
+        }
+      }
+
+      class Edge {
+        constructor(node1, node2, bidir=true) {
+          this.nodes=[];
+          this.nodes.push(node1);
+          this.nodes.push(node2);
+          this.bidir = bidir;
+        }
+        draw() {
+          stroke(255);
+          line(this.nodes[0].valueOf("x"), this.nodes[0].valueOf("y"),this.nodes[1].valueOf("x"),this.nodes[1].valueOf("y"));
+        }
+      }
+
+      let graph = new Graph();
+      let connectBtn, unconnectBtn, setStartBtn, setEndBtn;
+
+      function setup() {
+        createCanvas(500,500);
+        background(0);
+
+        connectBtn = createButton('Forbind');
+        unconnectBtn = createButton('Frakobel');
+        setStartBtn = createButton('Hjem');
+        setEndBtn = createButton('Mål');
+        connectBtn.mousePressed(function() {graph.connect();});
+        unconnectBtn.mousePressed(function() {graph.unconnect();});
+        setStartBtn.mousePressed(function() {graph.sethome();});
+        setEndBtn.mousePressed(function() {graph.setend();});
+      }
+
+      function draw() {
+        background(0);
+        graph.draw();
+        if(graph.selected[0].isempty||graph.selected[1].isempty)connectBtn.hide();
+        else connectBtn.show();
+      }
+
+      function mousePressed() {
+        let state = 0;          //0: Placér - 1: Valgt - 2: Forbundet - 3: Kollideret
+        for (node of graph.valueOf()) {
+          if(node.collide(10)) {
+            graph.selected.shift();
+            graph.selected.push(node);
+            state=1;
+          } else if(node.collide(20)) state = 2;
+        } if(state==0) graph.add(new Node(mouseX, mouseY));
+
+      }
+
+      // class Graf {
+      //   constructor(V, E = 0) {
+      //     this.V = [];
+      //     this.kanter = E.length || V;
+      //     this.eulersk = false;
+      //     if(typeof(E) === "object") for (let EN of E) this.V.push(new Knude(EN[0], EN[1]));
+      //   }
+      //
+      //   vis() {
+      //     stroke(255);
+      //     beginShape();
+      //     for (let V of this.V) {
+      //       let x = random()*450+25, y = random()*450+25;
+      //       ellipse(x, y, 25, 25);
+      //       vertex(x, y);
+      //     }
+      //     noFill();
+      //     endShape(CLOSE);
+      //   }
+      //
+      //   opdel(...K) {
+      //
+      //   }
+      //
+      //   walk(...K) {
+      //
+      //   }
+      //
+      //   sti(lukket, ...K) {
+      //
+      //   }
+      //
+      //   plan(...K) {
+      //
+      //   }
+      // }
+      // class Knude {
+      //   constructor(fra, til) {
+      //     this.VN = fra;
+      //     this.knuder = [];
+      //     this.knuder.push(til);
+      //   }
+      //   sti(til) { this.knuder.push(til); }
+      //   grad() { return this.knuder.length; }
+      //   static abs(knude) { return knude.knuder.length; }
+      // }
+      // function tegn(graf) {
+      //
+      //   for (let V of graf.V) {
+      //     //console.log(graf, V);
+      //     console.log("done",rek(graf, V));
+      //   }
+      // }
+      // function rek(graf, vertex, next=null, path=[]) {
+      //   if (vertex==null) vertex = graf.V[next];
+      //   path.push(vertex);
+      //   if (vertex.knuder.length = 0) return path;
+      //   console.log(vertex);
+      //   for (let K of vertex.knuder) {
+      //     return rek(graf, null, K, path);
+      //   }
+      // }
+      // function tegnSti() {
+      //
+      //}
+
+    </script>
+  </body>
+</html>
