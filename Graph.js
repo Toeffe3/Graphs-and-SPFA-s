@@ -11,7 +11,7 @@ class Graph {
 
   add(x) {
     this.nodes.push(x);
-    return this;
+    return this.nodes[this.nodes.length-1];
   }
 
   draw() {
@@ -54,7 +54,20 @@ class Graph {
     this.end = n;
     this.nosel();
   }
-
+  select(node) {this.selected.shift();this.selected.push(node);}
   nosel() {this.selected=[new Node(),new Node()];}
   valueOf() {return this.nodes;}
+
+  getNode(n) {
+    this.nodes.forEach(function(c){
+      if(c==n)return c;
+    });
+  }
+
+  simpel() {
+    let sg = [];
+    for(let e of this.edges)
+      sg.push([e.nodes[0].name, e.nodes[1].name, round(e.length)]);
+    return sg;
+  }
 }

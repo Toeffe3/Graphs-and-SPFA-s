@@ -74,4 +74,4 @@ function mousePressed() {
       state=1;
     } else if(node.collide(20))state=2;
   } if(state==0)graph.add(new Node(mouseX,mouseY));
-}
+} 
