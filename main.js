@@ -1,5 +1,5 @@
 this.d = undefined;
-let graph = new Graph();
+let graph = new Graph(), lastpath="0";
 let dijkstraBtn, connectBtn, unconnectBtn, setStartBtn, setEndBtn;
 
 function setup() {
@@ -13,11 +13,27 @@ function setup() {
   setEndBtn = createButton('Mål');
   clearSelection = createButton('Ryd markering');
   dijkstraBtn.mousePressed(function() {
-    if(!window.d) window.d = dijkstra(graph.simpel(), "A", "D");
+    if(graph.home.isempty)graph.home=graph.nodes[0];
+    if(graph.end.isempty)graph.end=graph.nodes[graph.nodes.length-1];
+    if(!window.d) window.d = dijkstra(graph.simpel(), graph.home.name, graph.end.name);
     [path, length] = window.d();
-    console.log(path)
-    console.log(length)
-    if(length!=-1) window.d = undefined;
+    console.log(path, length)
+    if(typeof path == "string") {
+      graph.getNode(path).path=1;
+      if(lastpath)graph.getEdge(path, lastpath).path=1;
+    }
+    lastpath = path;
+    if(length!=-1) {
+      for (n of graph.nodes) n.path=0;
+      for (e of graph.edges) e.path=0;
+      for (let i = 0; i < path.length; i++) {
+        graph.getNode(path[i]).path=2;
+        console.log(path[i], path[i+1]);
+        let p = graph.getEdge(path[i], path[i+1]||graph.end.name);
+        if(p.path!==-1)p.path=2
+      }
+      window.d = undefined
+    };
   });
   connectBtn.mousePressed(function() {graph.connect();});
   unconnectBtn.mousePressed(function() {graph.unconnect();});
@@ -25,22 +41,22 @@ function setup() {
   setEndBtn.mousePressed(function() {graph.setend();});
   clearSelection.mousePressed(function() {graph.nosel();});
 
-  graph.selected.shift();
-  graph.selected.push(graph.add(new Node(100,200)));
-  graph.selected.shift();
-  graph.selected.push(graph.add(new Node(200,250)));
-  graph.connect();
-  graph.selected.shift();
-  graph.selected.push(graph.valueOf()[1]);
-  graph.selected.shift();
-  graph.selected.push(graph.add(new Node(230,340)));
-  graph.connect();
-  graph.selected.shift();
-  graph.selected.push(graph.valueOf()[2]);
-  graph.selected.shift();
-  graph.selected.push(graph.add(new Node(450,100)));
-  graph.connect();
-  graph.draw();
+  // graph.selected.shift();
+  // graph.selected.push(graph.add(new Node(100,200)));
+  // graph.selected.shift();
+  // graph.selected.push(graph.add(new Node(200,250)));
+  // graph.connect();
+  // graph.selected.shift();
+  // graph.selected.push(graph.valueOf()[1]);
+  // graph.selected.shift();
+  // graph.selected.push(graph.add(new Node(230,340)));
+  // graph.connect();
+  // graph.selected.shift();
+  // graph.selected.push(graph.valueOf()[2]);
+  // graph.selected.shift();
+  // graph.selected.push(graph.add(new Node(450,100)));
+  // graph.connect();
+  // graph.draw();
 }
 
 function draw() {
@@ -74,4 +90,4 @@ function mousePressed() {
       state=1;
     } else if(node.collide(20))state=2;
   } if(state==0)graph.add(new Node(mouseX,mouseY));
-} 
+}

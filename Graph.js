@@ -58,10 +58,17 @@ class Graph {
   nosel() {this.selected=[new Node(),new Node()];}
   valueOf() {return this.nodes;}
 
-  getNode(n) {
-    this.nodes.forEach(function(c){
-      if(c==n)return c;
-    });
+  getNode(a) {
+    for (let n of this.nodes) {
+      if(a==n.name) return n;
+    }
+  }
+
+  getEdge(a, b) {
+    for (let e of this.edges) {
+      if(e.islinked(a) && e.islinked(b)) return e;
+    }
+    return {path:-1}
   }
 
   simpel() {
